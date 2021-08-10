@@ -1,5 +1,6 @@
 package com.example.userservice.controller;
 
+import com.example.userservice.dto.UserDto;
 import com.example.userservice.jpa.UserRepository;
 import com.example.userservice.service.UserService;
 import com.example.userservice.vo.RequestUser;
@@ -9,8 +10,11 @@ import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 
@@ -51,19 +55,24 @@ class UserContollerTest {
     void createUser() {
 
         //given
-        RequestUser user = new RequestUser();
-        user.setEmail("xxoals10212@naver.com");
-        user.setName("taemin");
-        user.setPwd("1234");
+        UserDto userDto = new UserDto();
+        userDto.setEmail("xxoals10216@naver.com");
+        userDto.setName("taemin");
+        userDto.setPwd("1234");
+        RestTemplate restTemplate = new RestTemplate();
 
         //when
-        ResponseEntity<ResponseUser> responseEntity = userContoller.createUser(user);
+        String url = "http://127.0.0.1:8000/user-service/users";
+
+        //ResponseEntity<ResponseUser> responseEntity = userContoller.createUser(user);
+        HttpEntity<UserDto> requestEntity = new HttpEntity<>(userDto);
+        ResponseEntity<ResponseUser> responseEntity = restTemplate.exchange(url, HttpMethod.POST, requestEntity, ResponseUser.class);
 
         //then
         responseEntity.getStatusCode();
 
         //assert
-        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        assertEquals(HttpStatus.CREATED, responseEntity.getStatusCode());
 
     }
 
